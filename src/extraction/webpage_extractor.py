@@ -1,3 +1,5 @@
+import importlib.util
+import pkgutil
 import re
 from typing import Any
 from urllib.parse import urlparse
@@ -5,6 +7,14 @@ from urllib.parse import urlparse
 import requests
 import trafilatura
 from bs4 import BeautifulSoup
+
+if not hasattr(pkgutil, "find_loader"):
+    def find_loader(name: str):
+        spec = importlib.util.find_spec(name)
+        return spec.loader if spec else None
+
+    pkgutil.find_loader = find_loader
+
 from imdb import Cinemagoer
 from readability import Document
 

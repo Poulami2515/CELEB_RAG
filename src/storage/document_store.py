@@ -77,6 +77,195 @@ def save_documents(
         f"to {filepath}"
     )
 
+def save_media_documents(
+    celebrity_name: str,
+    documents: list,
+    filename: str
+) -> None:
+    """
+    Generic media document saver.
+
+    Examples:
+    ----------
+    youtube_documents.json
+    podcast_documents.json
+    instagram_documents.json
+    twitter_documents.json
+    tiktok_documents.json
+    """
+
+    directory = get_celebrity_directory(
+        celebrity_name
+    )
+
+    filepath = (
+        directory /
+        filename
+    )
+
+    serialized_documents = [
+        document.model_dump()
+        for document in documents
+    ]
+
+    with open(
+        filepath,
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            serialized_documents,
+            file,
+            indent=4,
+            ensure_ascii=False
+        )
+
+    print(
+        f"Saved {len(documents)} "
+        f"documents to {filepath}"
+    )
+
+
+def load_media_documents(
+    celebrity_name: str,
+    filename: str
+) -> list:
+    """
+    Generic media document loader.
+    """
+
+    directory = get_celebrity_directory(
+        celebrity_name
+    )
+
+    filepath = (
+        directory /
+        filename
+    )
+
+    if not filepath.exists():
+
+        return []
+
+    with open(
+        filepath,
+        "r",
+        encoding="utf-8"
+    ) as file:
+
+        return json.load(file)
+
+
+def save_youtube_documents(
+    celebrity_name: str,
+    youtube_documents: list
+) -> None:
+
+    save_media_documents(
+        celebrity_name,
+        youtube_documents,
+        "youtube_documents.json"
+    )
+
+
+def load_youtube_documents(
+    celebrity_name: str
+) -> list:
+
+    return load_media_documents(
+        celebrity_name,
+        "youtube_documents.json"
+    )
+
+
+def save_podcast_documents(
+    celebrity_name: str,
+    podcast_documents: list
+) -> None:
+
+    save_media_documents(
+        celebrity_name,
+        podcast_documents,
+        "podcast_documents.json"
+    )
+
+
+def load_podcast_documents(
+    celebrity_name: str
+) -> list:
+
+    return load_media_documents(
+        celebrity_name,
+        "podcast_documents.json"
+    )
+
+
+def save_instagram_documents(
+    celebrity_name: str,
+    instagram_documents: list
+) -> None:
+
+    save_media_documents(
+        celebrity_name,
+        instagram_documents,
+        "instagram_documents.json"
+    )
+
+
+def load_instagram_documents(
+    celebrity_name: str
+) -> list:
+
+    return load_media_documents(
+        celebrity_name,
+        "instagram_documents.json"
+    )
+
+
+def save_twitter_documents(
+    celebrity_name: str,
+    twitter_documents: list
+) -> None:
+
+    save_media_documents(
+        celebrity_name,
+        twitter_documents,
+        "twitter_documents.json"
+    )
+
+
+def load_twitter_documents(
+    celebrity_name: str
+) -> list:
+
+    return load_media_documents(
+        celebrity_name,
+        "twitter_documents.json"
+    )
+
+
+def save_tiktok_documents(
+    celebrity_name: str,
+    tiktok_documents: list
+) -> None:
+
+    save_media_documents(
+        celebrity_name,
+        tiktok_documents,
+        "tiktok_documents.json"
+    )
+
+
+def load_tiktok_documents(
+    celebrity_name: str
+) -> list:
+
+    return load_media_documents(
+        celebrity_name,
+        "tiktok_documents.json"
+    )
+
 
 def load_documents(
     celebrity_name: str
@@ -139,6 +328,14 @@ def save_metadata(
                 .netloc
                 .lower()
             )
+            if domain.startswith("www."):
+                domain = domain[4:]
+            if "wikipedia.org" in domain:
+                domain = "wikipedia.org"
+            if "imdb.com" in domain:
+                domain = "imdb.com"
+            if "bbc.com" in domain:
+                domain = "bbc.com"
             domain_counter[domain] += 1
         except Exception:
             continue
