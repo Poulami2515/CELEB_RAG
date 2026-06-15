@@ -1,61 +1,78 @@
 # FOLDER STRUCTURE:
 
 ```
-celeb_rag/
-├── .env.example              # template for SEARXNG_URL
+CELEB_RAG/
+├── .env
+├── .env.example
 ├── .gitignore
-├── docker-compose.yml        # local SearXNG (Docker)
+├── docker-compose.yml
+├── README.md
 ├── requirements.txt
 │
 ├── searxng/
-│   └── settings.yml          # SearXNG config (json format enabled)
+│   └── settings.yml
 │
 ├── src/
-│   ├── main.py               # entry point
-│   │
-│   ├── models/
-│   │   ├── search_result.py
-│   │   └── extracted_document.py
-│   │
-│   ├── search/
-│   │   ├── aggregator.py     # DuckDuckGo + SearXNG
-│   │   ├── duckduckgo.py
-│   │   ├── searxng.py
-│   │   ├── storage.py        # saves search_results.json
-│   │   └── utils.py
-│   │
-│   ├── ranking/
-│   │   └── bm25.py
-│   │
-│   ├── ingestion/
-│   │   ├── query_generator.py
-│   │   └── celebrity_ingestor.py   # full pipeline
+│   ├── main.py
 │   │
 │   ├── extraction/
 │   │   └── webpage_extractor.py
 │   │
-│   ├── storage/
-│   │   └── document_store.py       # save/load documents + metadata
+│   ├── ingestion/
+│   │   ├── celebrity_ingestor.py
+│   │   └── query_generator.py
 │   │
-│   └── media/                      # stubs (empty for now)
-│       ├── youtube_ingestor.py
-│       ├── twitter_ingestor.py
-│       ├── instagram_ingestor.py
-│       ├── tiktok_ingestor.py
-│       ├── image_ingestor.py
-│       └── podcast_ingestor.py
+│   ├── media/
+│   │   ├── image_ingestor.py
+│   │   ├── instagram_ingestor.py
+│   │   ├── podcast_ingestor.py
+│   │   ├── tiktok_ingestor.py
+│   │   ├── twitter_ingestor.py
+│   │   ├── whisper_provider.py
+│   │   ├── youtube_ingestor.py
+│   │   ├── youtube_pipeline.py
+│   │   └── youtube_search.py
+│   │
+│   ├── models/
+│   │   ├── extracted_document.py
+│   │   ├── search_result.py
+│   │   └── youtube_document.py
+│   │
+│   ├── ranking/
+│   │   └── bm25.py
+│   │
+│   ├── search/
+│   │   ├── aggregator.py
+│   │   ├── duckduckgo.py
+│   │   ├── searxng.py
+│   │   ├── storage.py
+│   │   └── utils.py
+│   │
+│   └── storage/
+│       ├── document_store.py
+│       └── failure_store.py
 │
-├── .env                        # your local secrets/config
-├── .venv/                      # Python virtual environment
-├── pyrightconfig.json          # editor/type-checker config
-├── .vscode/                    # editor settings
-├── data/                       # raw search result dumps
-├── storage/                    # ingested celebrity documents
+├── storage/
+│   ├── failed_youtube_urls.json
 │   └── celebrities/
-│       └── <celebrity_name>/
+│       ├── deepika_padukone/
+│       │   ├── documents.json
+│       │   ├── metadata.json
+│       │   └── youtube_documents.json
+│       ├── rick_astley/
+│       │   └── youtube_documents.json
+│       └── shah_rukh_khan/
 │           ├── documents.json
 │           └── metadata.json
-└── *.pptx                      # progress decks (gitignored)
+│
+└── tests/
+    ├── test_audio_download.py
+    ├── test_whisper.py
+    ├── test_whisper_fallback.py
+    ├── test_youtube.py
+    ├── test_youtube_document.py
+    ├── test_youtube_search.py
+    └── test_youtube_stotage.py
 ```
 
 
