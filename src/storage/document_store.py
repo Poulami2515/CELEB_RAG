@@ -424,3 +424,58 @@ def celebrity_exists(
     )
 
     return filepath.exists()
+
+def save_podcast_documents(
+    celebrity_name: str,
+    documents: list
+):
+    directory = (
+        get_celebrity_directory(
+            celebrity_name
+        )
+    )
+
+    filepath = (
+        directory /
+        "podcast_documents.json"
+    )
+
+    serialized_documents = [
+
+        document.model_dump()
+
+        for document
+
+        in documents
+    ]
+
+    with open(
+
+        filepath,
+
+        "w",
+
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+
+            serialized_documents,
+
+            file,
+
+            indent=4,
+
+            ensure_ascii=False
+        )
+
+    print(
+
+        f"Saved "
+
+        f"{len(documents)} "
+
+        f"podcast documents"
+
+        f" to {filepath}"
+    )
