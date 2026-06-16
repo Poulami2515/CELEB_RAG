@@ -25,7 +25,10 @@ CELEB_RAG/
 │   ├── media/
 │   │   ├── image_ingestor.py
 │   │   ├── instagram_ingestor.py
-│   │   ├── podcast_ingestor.py
+│   │   ├── podcast_document.py          ← new
+│   │   ├── podcast_ingestor.py          ← updated
+│   │   ├── podcast_pipeline.py          ← new
+│   │   ├── podcast_search.py            ← new
 │   │   ├── tiktok_ingestor.py
 │   │   ├── twitter_ingestor.py
 │   │   ├── whisper_provider.py
@@ -49,7 +52,7 @@ CELEB_RAG/
 │   │   └── utils.py
 │   │
 │   └── storage/
-│       ├── document_store.py
+│       ├── document_store.py            ← updated
 │       └── failure_store.py
 │
 ├── storage/
@@ -63,10 +66,14 @@ CELEB_RAG/
 │       │   └── youtube_documents.json
 │       └── shah_rukh_khan/
 │           ├── documents.json
-│           └── metadata.json
+│           ├── metadata.json
+│           ├── podcast_documents.json   ← new
+│           └── youtube_documents.json
 │
 └── tests/
     ├── test_audio_download.py
+    ├── test_podcast_pipeline.py       ← new
+    ├── test_podcast_search.py         ← new
     ├── test_whisper.py
     ├── test_whisper_fallback.py
     ├── test_youtube.py
