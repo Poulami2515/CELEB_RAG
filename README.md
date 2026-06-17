@@ -24,12 +24,14 @@ CELEB_RAG/
 │   │
 │   ├── media/
 │   │   ├── image_ingestor.py
-│   │   ├── instagram_ingestor.py
-│   │   ├── podcast_document.py          ← new
-│   │   ├── podcast_ingestor.py          ← updated
-│   │   ├── podcast_pipeline.py          ← new
-│   │   ├── podcast_search.py            ← new
-│   │   ├── tiktok_ingestor.py
+│   │   ├── instagram_document.py      ← new
+│   │   ├── instagram_ingestor.py      ← updated
+│   │   ├── instagram_pipeline.py      ← new
+│   │   ├── instagram_search.py        ← new
+│   │   ├── podcast_document.py
+│   │   ├── podcast_ingestor.py
+│   │   ├── podcast_pipeline.py
+│   │   ├── podcast_search.py
 │   │   ├── twitter_ingestor.py
 │   │   ├── whisper_provider.py
 │   │   ├── youtube_ingestor.py
@@ -52,7 +54,7 @@ CELEB_RAG/
 │   │   └── utils.py
 │   │
 │   └── storage/
-│       ├── document_store.py            ← updated
+│       ├── document_store.py          ← updated
 │       └── failure_store.py
 │
 ├── storage/
@@ -67,13 +69,17 @@ CELEB_RAG/
 │       └── shah_rukh_khan/
 │           ├── documents.json
 │           ├── metadata.json
-│           ├── podcast_documents.json   ← new
+│           ├── instagram_documents.json   ← new
+│           ├── podcast_documents.json
 │           └── youtube_documents.json
 │
 └── tests/
     ├── test_audio_download.py
-    ├── test_podcast_pipeline.py       ← new
-    ├── test_podcast_search.py         ← new
+    ├── test_instagram_ingestor.py     ← new
+    ├── test_instagram_pipeline.py     ← new
+    ├── test_instagram_search.py       ← new
+    ├── test_podcast_pipeline.py
+    ├── test_podcast_search.py
     ├── test_whisper.py
     ├── test_whisper_fallback.py
     ├── test_youtube.py
