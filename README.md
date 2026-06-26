@@ -2,91 +2,123 @@
 
 ```
 CELEB_RAG/
-├── .env
+├── .env                          # API keys (OpenRouter, etc.) — gitignored
 ├── .env.example
 ├── .gitignore
-├── docker-compose.yml
+├── docker-compose.yml            # SearXNG search service (optional)
 ├── README.md
 ├── requirements.txt
 │
 ├── searxng/
-│   └── settings.yml
+│   └── settings.yml              # SearXNG config (localhost:8080)
 │
 ├── src/
-│   ├── main.py
+│   ├── main.py                   # Orchestrates full ingestion pipeline
 │   │
 │   ├── extraction/
-│   │   └── webpage_extractor.py
+│   │   └── webpage_extractor.py  # Scrape & extract text from web pages
 │   │
 │   ├── ingestion/
-│   │   ├── celebrity_ingestor.py
-│   │   └── query_generator.py
+│   │   ├── celebrity_ingestor.py   # Web ingestion entry point
+│   │   └── query_generator.py        # Search query generation
 │   │
-│   ├── media/
-│   │   ├── image_ingestor.py
-│   │   ├── instagram_document.py      ← new
-│   │   ├── instagram_ingestor.py      ← updated
-│   │   ├── instagram_pipeline.py      ← new
-│   │   ├── instagram_search.py        ← new
-│   │   ├── podcast_document.py
-│   │   ├── podcast_ingestor.py
-│   │   ├── podcast_pipeline.py
-│   │   ├── podcast_search.py
-│   │   ├── twitter_ingestor.py
-│   │   ├── whisper_provider.py
-│   │   ├── youtube_ingestor.py
-│   │   ├── youtube_pipeline.py
-│   │   └── youtube_search.py
+│   ├── search/
+│   │   ├── aggregator.py         # Combines SearXNG + DuckDuckGo
+│   │   ├── duckduckgo.py
+│   │   ├── searxng.py
+│   │   ├── storage.py
+│   │   └── utils.py
+│   │
+│   ├── ranking/
+│   │   └── bm25.py
 │   │
 │   ├── models/
 │   │   ├── extracted_document.py
 │   │   ├── search_result.py
 │   │   └── youtube_document.py
 │   │
-│   ├── ranking/
-│   │   └── bm25.py
+│   ├── storage/
+│   │   ├── document_store.py     # Save/load all document types
+│   │   └── failure_store.py      # Failed YouTube URL tracking
 │   │
-│   ├── search/
-│   │   ├── aggregator.py
-│   │   ├── duckduckgo.py
-│   │   ├── searxng.py
-│   │   ├── storage.py
-│   │   └── utils.py
+│   ├── media/                    # Media ingestion pipelines
+│   │   ├── youtube_search.py
+│   │   ├── youtube_ingestor.py
+│   │   ├── youtube_pipeline.py   # YouTube: search → transcript → save
+│   │   │
+│   │   ├── podcast_search.py
+│   │   ├── podcast_ingestor.py
+│   │   ├── podcast_document.py
+│   │   ├── podcast_pipeline.py   # Podcast: search → transcript → save
+│   │   │
+│   │   ├── instagram_search.py
+│   │   ├── instagram_ingestor.py
+│   │   ├── instagram_document.py
+│   │   ├── instagram_pipeline.py # Instagram URLs + metadata
+│   │   │
+│   │   ├── instagram_media_ingestor.py   # Download posts/reels (instaloader)
+│   │   ├── instagram_media_document.py
+│   │   ├── instagram_media_pipeline.py     # Download → caption → transcribe
+│   │   ├── instagram_captioner.py          # VLM image captions
+│   │   ├── reel_transcriber.py             # Whisper reel transcription
+│   │   │
+│   │   ├── whisper_provider.py   # faster-whisper (GPU/CPU fallback)
+│   │   ├── image_ingestor.py
+│   │   └── twitter_ingestor.py
 │   │
-│   └── storage/
-│       ├── document_store.py          ← updated
-│       └── failure_store.py
+│   └── vlm/                      # Vision-Language Model (OpenRouter)
+│       ├── __init__.py
+│       ├── base.py
+│       ├── openrouter.py
+│       ├── prompts.py
+│       └── utils.py
 │
-├── storage/
+├── storage/                      # Generated data — gitignored
 │   ├── failed_youtube_urls.json
 │   └── celebrities/
-│       ├── deepika_padukone/
-│       │   ├── documents.json
-│       │   ├── metadata.json
-│       │   └── youtube_documents.json
-│       ├── rick_astley/
-│       │   └── youtube_documents.json
-│       └── shah_rukh_khan/
-│           ├── documents.json
-│           ├── metadata.json
-│           ├── instagram_documents.json   ← new
-│           ├── podcast_documents.json
-│           └── youtube_documents.json
+│       └── <celebrity_slug>/     # e.g. shah_rukh_khan, katrina_kaif
+│           ├── documents.json              # Web articles
+│           ├── metadata.json               # Web ingestion metadata
+│           ├── youtube_documents.json      # YouTube transcripts
+│           ├── podcast_documents.json      # Podcast transcripts
+│           ├── instagram_documents.json    # Instagram URL metadata
+│           └── instagram_media/            # Downloaded media (when reachable)
+│               └── <shortcode>/            # e.g. C4QXrpnvAEN
+│                   ├── metadata.json
+│                   ├── image.jpg             # or reel.mp4
+│                   ├── caption.txt           # VLM-generated
+│                   └── transcript.txt      # Whisper-generated (reels)
 │
 └── tests/
-    ├── test_audio_download.py
-    ├── test_instagram_ingestor.py     ← new
-    ├── test_instagram_pipeline.py     ← new
-    ├── test_instagram_search.py       ← new
-    ├── test_podcast_pipeline.py
-    ├── test_podcast_search.py
+    ├── test_youtube.py
+    ├── test_youtube_search.py
+    ├── test_youtube_document.py
+    ├── test_youtube_stotage.py
     ├── test_whisper.py
     ├── test_whisper_fallback.py
-    ├── test_youtube.py
-    ├── test_youtube_document.py
-    ├── test_youtube_search.py
-    └── test_youtube_stotage.py
+    ├── test_audio_download.py
+    ├── test_podcast_search.py
+    ├── test_podcast_pipeline.py
+    ├── test_instagram_search.py
+    ├── test_instagram_ingestor.py
+    ├── test_instagram_pipeline.py
+    ├── test_instagram_media_ingestor.py
+    ├── test_instagram_captioner.py
+    └── test_reel_transcriber.py
 ```
+
+
+main.py
+
+```
+1. Web          → documents.json
+2. YouTube      → youtube_documents.json
+3. Podcast      → podcast_documents.json
+4. Instagram    → instagram_documents.json
+5. IG Media     → instagram_media/<shortcode>/  (blocked if Instagram unavailable)
+```
+
+
 
 
 Clone locally :
