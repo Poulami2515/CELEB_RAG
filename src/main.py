@@ -1,5 +1,3 @@
-from src.ingestion.celebrity_ingestor import ingest_celebrity
-
 from src.ingestion.celebrity_ingestor import (
     ingest_celebrity
 )
@@ -11,6 +9,15 @@ from src.media.youtube_pipeline import (
 from src.media.podcast_pipeline import (
     ingest_podcasts
 )
+
+from src.media.instagram_pipeline import (
+    ingest_instagram
+)
+
+from src.media.instagram_media_pipeline import (
+    process_instagram_media
+)
+
 
 def ingest_all_sources(
     celebrity: str,
@@ -49,12 +56,8 @@ def ingest_all_sources(
         f"YouTube documents"
     )
 
-    # ----------------------------------
-    # PODCASTS
-    # ----------------------------------
-
     print(
-        "\n[3/3] Podcast Ingestion"
+        "\n=== PODCAST INGESTION ===\n"
     )
 
     podcast_documents = (
@@ -66,6 +69,30 @@ def ingest_all_sources(
     print(
         f"Podcast Documents: "
         f"{len(podcast_documents)}"
+    )
+
+    print(
+        "\n=== INSTAGRAM INGESTION ===\n"
+    )
+
+    instagram_documents = (
+        ingest_instagram(
+            celebrity,
+            max_posts=10
+        )
+    )
+
+    print(
+        f"Instagram Documents: "
+        f"{len(instagram_documents)}"
+    )
+
+    print(
+        "\n=== INSTAGRAM MEDIA PROCESSING ===\n"
+    )
+
+    process_instagram_media(
+        celebrity
     )
 
     print(
@@ -84,14 +111,18 @@ def ingest_all_sources(
 
         "podcasts": len(
             podcast_documents
-        )
+        ),
+
+        "instagram": len(
+            instagram_documents
+        ),
     }
 
 
 def main():
 
     celebrity = (
-        "Shah Rukh Khan"
+        "Katrina Kaif"
     )
 
     stats = (
@@ -105,7 +136,6 @@ def main():
     )
 
     print(stats)
-
 
 
 if __name__ == "__main__":
