@@ -1,11 +1,32 @@
 import json
+import os
+import random
 import re
 import shutil
+import time
 
 from pathlib import Path
+from typing import TypedDict
 from urllib.parse import urlparse
 
 import instaloader
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SESSION_DIR = Path("storage/instagram_sessions")
+SESSION_DIR.mkdir(parents=True, exist_ok=True)
+
+_RATE_LIMITED_CONTEXTS: set[int] = set()
+
+
+class DownloadedInstagramMedia(TypedDict):
+    shortcode: str
+    media_directory: str
+    media_path: str | None
+    media_type: str
+    username: str
+
 
 from src.media.instagram_media_document import (
     InstagramMediaDocument
@@ -327,9 +348,58 @@ def load_official_instagram_profile(
 
 
 
+def _pause_after_instagram_request() -> None:
+    time.sleep(random.uniform(3, 7))
+
+
+def _apply_instagram_rate_limit(
+    loader: instaloader.Instaloader
+) -> None:
+    """
+    Pause after each Instagram HTTP request made
+    through Instaloader's context.
+    """
+
+    context = loader.context
+
+    context_id = id(context)
+
+    if context_id in _RATE_LIMITED_CONTEXTS:
+        return
+
+    original_get_json = context.get_json
+
+    def get_json_with_pause(*args, **kwargs):
+        try:
+            return original_get_json(*args, **kwargs)
+        finally:
+            _pause_after_instagram_request()
+
+    context.get_json = get_json_with_pause
+
+    original_get_raw = context.get_raw
+
+    def get_raw_with_pause(*args, **kwargs):
+        try:
+            return original_get_raw(*args, **kwargs)
+        finally:
+            _pause_after_instagram_request()
+
+    context.get_raw = get_raw_with_pause
+
+    _RATE_LIMITED_CONTEXTS.add(context_id)
+
+
+def _instagram_session_file(username: str) -> Path:
+    return SESSION_DIR / f"session-{username}"
+
+
 def create_instaloader() -> instaloader.Instaloader:
     """
     Create and configure an Instaloader instance.
+
+    Uses INSTAGRAM_USERNAME and INSTAGRAM_PASSWORD from .env
+    when available. Reuses a saved session file on later runs.
 
     Returns
     -------
@@ -367,6 +437,32 @@ def create_instaloader() -> instaloader.Instaloader:
 
         request_timeout=30
     )
+
+    _apply_instagram_rate_limit(loader)
+
+    user_name = os.getenv("INSTAGRAM_USERNAME")
+    password = os.getenv("INSTAGRAM_PASSWORD")
+
+    if not user_name:
+        return loader
+
+    session_file = _instagram_session_file(user_name)
+
+    if session_file.exists():
+        loader.load_session_from_file(
+            user_name,
+            str(session_file)
+        )
+        return loader
+
+    if not password:
+        raise ValueError(
+            "INSTAGRAM_PASSWORD is required for first login"
+        )
+
+    loader.login(user_name, password)
+    _pause_after_instagram_request()
+    loader.save_session_to_file(str(session_file))
 
     return loader
 
@@ -491,7 +587,7 @@ def save_post_metadata(
 def download_instagram_media(
     celebrity_name: str,
     max_reels: int = MAX_REELS
-) -> list[InstagramMediaDocument]:
+) -> list[DownloadedInstagramMedia]:
     """
     Download Instagram media from the
     official profile.
@@ -508,7 +604,7 @@ def download_instagram_media(
 
     Returns
     -------
-    list[InstagramMediaDocument]
+    list[DownloadedInstagramMedia]
         Information about every
         downloaded media item.
     """

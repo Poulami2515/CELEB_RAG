@@ -150,13 +150,19 @@ class OpenRouterVisionLanguageModel(BaseVisionLanguageModel):
 
         )
 
-        return (
+        content = (
             response
             .choices[0]
             .message
             .content
-            .strip()
         )
+
+        if content is None:
+            raise ValueError(
+                "OpenRouter returned empty caption"
+            )
+
+        return content.strip()
 
     # ---------------------------------------------
 
