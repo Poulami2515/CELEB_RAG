@@ -173,9 +173,7 @@ cd C:\Users\poulami.paul\PyCharmMiscProject\CELEB_RAG
 
 git status
 
-git add src/media/instagram_document.py src/media/instagram_pipeline.py src/media/instagram_search.py src/media/instagram_ingestor.py src/storage/document_store.py tests/test_instagram_ingestor.py tests/test_instagram_pipeline.py tests/test_instagram_search.py
-
-git add src/media/tiktok_ingestor.py
+git add .
 
 git commit -m "Add Instagram ingestion pipeline and update media storage helpers."
 
